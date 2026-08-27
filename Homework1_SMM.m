@@ -11,35 +11,42 @@ u_x = 0.8;
 u_y = 0.8;
 v = 0.01;
 t_total = 10; %not sure yet%
-delta_t = 0.1; %time step, TBD %
+delta_t = 0.1; %time step, TBD%
 i = 1; %x index (column)%
-j = 1: %y index (row)%
+j = 1; %y index (row)%
 t = 1; %t index%
 
 % Set Up Grid %
 frames = t_total / delta_t; %find number of time steps%
-phi = double.empty(x_nodes,y_nodes,frames); %defined empty 81x81 grid with third dimension for time
+phi = zeros(x_nodes,y_nodes,frames); %defined empty 81x81 grid with third dimension for time
 
 % Assign Initial Condition %
-for i = 1:x_nodes
+
+function initial_condition = init_state(x,y,v)          % Function that defines the initial conditions of all x,y coordinates %
+    initial_condition = exp(-(x-0.5)^2/v - (y-0.5)^2/2);
+end
+
+for i = 1:x_nodes                                       % Iterate through t = 1 (actual value 0) to determine starting values %
     for j = 1:y_nodes
         if i == 1
-            %send through boundary conditions
+            phi(i,j,t) = bc(); %I know I don't have to do it this way for this problem but I want to just to practice for the scenario where there's more complex bc%
         elseif i == i_nodes
-            %send through boundary conditions
+            phi(i,j,t) = bc(); 
         elseif j == 1
-            %send through boundary conditions
+            phi(i,j,t) = bc();
         elseif j == y_nodes
-            %send through boundary conditions
+            phi(i,j,t) = bc();
         else
-            phi(i,j,t) = init_state(i,j,v);
+            x = x_dist * (i - 1);
+            y = y_dist * (j - 1);
+            phi(i,j,t) = init_state(x,y,v);
         end
     end
 end
 
-function initial_condition = init_state(x,y,v)
-   initial_condition = exp(-(x-0.5)^2/v - (y-0.5)^2/2);
-end
-
 % Boundary Conditions %
+
+function bound_cond = bc(~)
+    bound_cond = 0;
+end
 
