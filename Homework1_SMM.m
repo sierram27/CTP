@@ -19,6 +19,8 @@ t = 1; %t index%
 % Set Up Grid %
 frames = t_total / delta_t; %find number of time steps%
 phi = zeros(x_nodes,y_nodes,frames); %defined empty 81x81 grid with third dimension for time
+delta_x = x_dist / (x_grids -1);
+delta_y = y_dist / (y_grids -1);
 
 % Assign Initial Condition %
 
@@ -30,15 +32,15 @@ for i = 1:x_nodes                                       % Iterate through t = 1 
     for j = 1:y_nodes
         if i == 1
             phi(i,j,t) = bc(); %I know I don't have to do it this way for this problem but I want to just to practice for the scenario where there's more complex bc%
-        elseif i == i_nodes
+        elseif i == x_nodes
             phi(i,j,t) = bc(); 
         elseif j == 1
             phi(i,j,t) = bc();
         elseif j == y_nodes
             phi(i,j,t) = bc();
         else
-            x = x_dist * (i - 1);
-            y = y_dist * (j - 1);
+            x = delta_x * (i - 1);
+            y = delta_y * (j - 1);
             phi(i,j,t) = init_state(x,y,v);
         end
     end
@@ -50,3 +52,35 @@ function bound_cond = bc(~)
     bound_cond = 0;
 end
 
+% Numerically Estimate %
+i = 1;
+j = 1;
+t = 2;
+
+function r_prev_time = R(u_x,u_y,v,delta_x,delta_y,center,left,right,up,down)
+    r_prev_time = u_x*(right-left)/(2*delta_x) + u_y*(up-down)/(2*delta_y) - v*(right-2*center+left)/delta_x^2 - v*(up-2*center+down)/delta_y^2;
+end
+
+function estimate = phi_new(delta_t,current,r)
+    estimate = current - delta_t * r;
+end
+
+for t = 2:frames
+    for i = 1:x_nodes
+        for j = 1:y_nodes
+            if i == 1
+                phi(i,j,t) = bc();
+            elseif i == x_nodes
+                phi(i,j,t) = bc();
+            elseif j == 1
+                phi(i,j,t) = bc();
+            elseif j == y_nodes
+                phi(i,j,t) = bc();
+            else
+                r = R(u_x,u_y,v,delta_x,delta_y,phi(i,j,t-1),phi(i-1,j,t-1),phi(i+1,j,t-1),phi(i,j+1,t-1),phi(i,j-1,t-1));
+                phi(i,j,t) = phi_new(delta_t,phi(i,j,(t-1)),r);
+            end
+        end
+    end
+
+end
