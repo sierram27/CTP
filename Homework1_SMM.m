@@ -37,6 +37,7 @@ for i = 1:x_nodes                                       % Iterate through t = 1 
 end
 
 % Boundary Conditions %
+    %this is also the analytical solution%
 
 function bound_cond = bc(u_x,u_y,v,x,y,t)
     bound_cond = (1/(4*t+1)) * exp(- ((x-u_x*t-0.5)^2 + (y-u_y*t-0.5)^2) / (v*(4*t+1)) );
@@ -82,6 +83,22 @@ end
 %surf(1:x_nodes,1:y_nodes,phi(1:x_nodes,1:y_nodes,1));
 
 % Plot Final Condition %
-surf(1:x_nodes,1:y_nodes,phi(1:x_nodes,1:y_nodes,frames));
+surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,phi(1:x_nodes,1:y_nodes,frames));
+figure
 
 % Plot Real Solution %
+t_real = 1.0;
+x_real = 0.0;
+y_real = 0.0;
+real_soln = zeros(x_nodes,y_nodes);
+for i = 1:x_nodes
+    for j = 1:y_nodes
+        x_real = delta_x * (i-1);
+        y_real = delta_y * (j-1);
+        real_soln(i,j) = bc(u_x,u_y,v,x_real,y_real,t_real);
+    end
+end
+
+surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,real_soln(1:x_nodes,1:y_nodes));
+
+% Find Error %
