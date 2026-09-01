@@ -90,7 +90,7 @@ figure
 t_real = 1.0;
 x_real = 0.0;
 y_real = 0.0;
-real_soln = zeros(x_nodes,y_nodes);
+real_soln = zeros(x_nodes,y_nodes, frames);
 for i = 1:x_nodes
     for j = 1:y_nodes
         x_real = delta_x * (i-1);
@@ -100,5 +100,25 @@ for i = 1:x_nodes
 end
 
 surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,real_soln(1:x_nodes,1:y_nodes));
+figure
 
 % Find Error %
+function squares = sq(true, estimate)
+    squares = (true - estimate)^2;
+end
+
+sum = 0.0;
+error = zeros(frames, 1);
+
+for t = 1:frames
+    for i = 1:x_nodes
+        for j = 1:y_nodes
+           error_for_node = sq(real_soln(i,j,t),phi(i,j,t));
+           sum = sum + error_for_node;
+        end
+    end
+    N = x_nodes * y_nodes;
+    error(t,1) = sqrt((1/N)*error_for_node);
+end
+
+plot((1:frames)*delta_t-delta_t,error(1:frames,1));
