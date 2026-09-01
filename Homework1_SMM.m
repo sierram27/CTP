@@ -78,9 +78,9 @@ for t = 2:frames
     end
 end
 
-
 % Plot Initial Condition %
-%surf(1:x_nodes,1:y_nodes,phi(1:x_nodes,1:y_nodes,1));
+%surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,phi(1:x_nodes,1:y_nodes,1));
+%figure
 
 % Plot Final Condition %
 surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,phi(1:x_nodes,1:y_nodes,frames));
@@ -100,7 +100,6 @@ for i = 1:x_nodes
 end
 
 surf((1:x_nodes)*delta_x-delta_x,(1:y_nodes)*delta_y-delta_y,real_soln(1:x_nodes,1:y_nodes));
-figure
 
 % Find Error %
 function squares = sq(true, estimate)
@@ -120,5 +119,3 @@ for t = 1:frames
     N = x_nodes * y_nodes;
     error(t,1) = sqrt((1/N)*error_for_node);
 end
-
-plot((1:frames)*delta_t-delta_t,error(1:frames,1));
